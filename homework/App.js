@@ -17,13 +17,29 @@ class App {
     // 2. Make an initial XMLHttpRequest using Util.fetchJSON() to populate your <select> element
 
     const root = document.getElementById('root');
+    const header = Util.createAndAppend('header', root, { class: 'header' });
+    Util.createAndAppend('p', header, { text: 'HYF Repositories' });
+    const selector = Util.createAndAppend('select', header, {
+      class: 'repo-selector',
+      'aria-label': 'HYF Repositories',
+    });
 
-    Util.createAndAppend('h1', root, { text: 'It works!' }); // TODO: replace with your own code
+    Util.createAndAppend('div', root, { id: 'container' });
+
+    selector.addEventListener('change', () => this.fetchContributorsAndRender(selector.value));
 
     try {
       const repos = await Util.fetchJSON(url);
+      repos.sort((one, two) => one.name.toLowerCase().localeCompare(two.name.toLowerCase()));
       this.repos = repos.map(repo => new Repository(repo));
-      // TODO: add your own code here
+      this.repos.forEach((repo, index) => {
+        Util.createAndAppend('option', selector, {
+          text: repo.name(),
+          value: index,
+        });
+      });
+
+      this.fetchContributorsAndRender(selector.value);
     } catch (error) {
       this.renderError(error);
     }
