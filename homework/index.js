@@ -142,7 +142,7 @@
       while (container.firstChild) {
         container.removeChild(container.firstChild);
       }
-      secondPart(selector.value, repos);
+      secondPart(repos[selector.value]);
     });
     const reposNames = repos.map(repo => repo.name);
     reposNames.forEach((name, index) => {
