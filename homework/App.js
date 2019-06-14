@@ -12,19 +12,21 @@ class App {
    * @param {string} url The GitHub URL for obtaining the organization's repositories.
    */
   async initialize(url) {
-    // Add code here to initialize your app
-    // 1. Create the fixed HTML elements of your page
-    // 2. Make an initial XMLHttpRequest using Util.fetchJSON() to populate your <select> element
-
     const root = document.getElementById('root');
-    const header = Util.createAndAppend('header', root, { class: 'header' });
-    Util.createAndAppend('p', header, { text: 'HYF Repositories' });
+    const header = Util.createAndAppend('header', root, {
+      class: 'header',
+    });
+    Util.createAndAppend('p', header, {
+      text: 'HYF Repositories',
+    });
     const selector = Util.createAndAppend('select', header, {
       class: 'repo-selector',
       'aria-label': 'HYF Repositories',
     });
 
-    Util.createAndAppend('div', root, { id: 'container' });
+    Util.createAndAppend('div', root, {
+      id: 'container',
+    });
 
     selector.addEventListener('change', () => this.fetchContributorsAndRender(selector.value));
 
@@ -68,10 +70,19 @@ class App {
       const container = document.getElementById('container');
       App.clearContainer(container);
 
-      const leftDiv = Util.createAndAppend('div', container);
-      const rightDiv = Util.createAndAppend('div', container);
-
-      const contributorList = Util.createAndAppend('ul', rightDiv);
+      const leftDiv = Util.createAndAppend('div', container, {
+        class: 'left-div whiteframe',
+      });
+      const rightDiv = Util.createAndAppend('div', container, {
+        class: 'right-div whiteframe',
+      });
+      Util.createAndAppend('p', rightDiv, {
+        text: 'Contributions',
+        class: 'contributor-header',
+      });
+      const contributorList = Util.createAndAppend('ul', rightDiv, {
+        class: 'contributor-list',
+      });
 
       repo.render(leftDiv);
 
@@ -88,7 +99,11 @@ class App {
    * @param {Error} error An Error object describing the error.
    */
   renderError(error) {
-    console.log(error); // TODO: replace with your own code
+    const root = document.getElementById('root');
+    Util.createAndAppend('div', root, {
+      text: error.message,
+      class: 'alert-error',
+    });
   }
 }
 
