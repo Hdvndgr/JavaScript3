@@ -35,34 +35,43 @@
 
   function renderError(error) {
     const root = document.getElementById('root');
-    createAndAppend('div', root, { text: error.message, class: 'alert-error' });
+    createAndAppend('div', root, {
+      text: error.message,
+      class: 'alert-error',
+    });
   }
 
-  function secondPart(val, dBase) {
+  function secondPart(repo) {
     const container = document.getElementById('container');
-    const leftDiv = createAndAppend('div', container, { class: 'left-div whiteframe' });
+    const leftDiv = createAndAppend('div', container, {
+      class: 'left-div whiteframe',
+    });
     const table = createAndAppend('table', leftDiv);
     const tbody = createAndAppend('tbody', table);
-    const rep = dBase[val];
 
-    for (let ix = 0; ix < 4; ix++) {
+    for (let index = 0; index < 4; index++) {
       const row = createAndAppend('tr', tbody);
-      const tdFirst = createAndAppend('td', row, { class: 'label' });
+      const tdFirst = createAndAppend('td', row, {
+        class: 'label',
+      });
       const tdSec = createAndAppend('td', row);
-      const updateDate = new Date(rep.updated_at).toLocaleString();
+      const updateDate = new Date(repo.updated_at).toLocaleString();
       // eslint-disable-next-line default-case
-      switch (ix) {
+      switch (index) {
         case 0:
           tdFirst.textContent = 'Repository :';
-          createAndAppend('a', tdSec, { text: rep.name, href: rep.html_url });
+          createAndAppend('a', tdSec, {
+            text: repo.name,
+            href: repo.html_url,
+          });
           break;
         case 1:
           tdFirst.textContent = 'Description :';
-          tdSec.textContent = rep.description;
+          tdSec.textContent = repo.description;
           break;
         case 2:
           tdFirst.textContent = 'Forks :';
-          tdSec.textContent = rep.forks;
+          tdSec.textContent = repo.forks;
           break;
         case 3:
           tdFirst.textContent = 'Updated :';
@@ -71,45 +80,59 @@
       }
     }
 
-    const rightDiv = createAndAppend('div', container, { class: 'right-div whiteframe' });
+    const rightDiv = createAndAppend('div', container, {
+      class: 'right-div whiteframe',
+    });
     createAndAppend('p', rightDiv, {
       text: 'Contributions',
       class: 'contributor-header',
     });
-    const ul = createAndAppend('ul', rightDiv, { class: 'contributor-list' });
-    const urlCol = rep.contributors_url;
-    fetchJSON(urlCol)
-      .then(dt => {
-        dt.forEach(cont => {
+    const ul = createAndAppend('ul', rightDiv, {
+      class: 'contributor-list',
+    });
+    const contributorsUrl = repo.contributors_url;
+    fetchJSON(contributorsUrl)
+      .then(contributors => {
+        contributors.forEach(contributor => {
           const li = createAndAppend('li', ul, {
             class: 'contributor-item',
             tabindex: 0,
-            'aria-label': cont.login,
+            'aria-label': contributor.login,
           });
 
           createAndAppend('img', li, {
-            src: cont.avatar_url,
+            src: contributor.avatar_url,
             height: 48,
             class: 'contributor-avatar',
           });
 
-          const contData = createAndAppend('div', li, { class: 'contributor-data' });
-          createAndAppend('div', contData, { text: cont.login });
-          createAndAppend('div', contData, {
-            text: cont.contributions,
+          const contributorData = createAndAppend('div', li, {
+            class: 'contributor-data',
+          });
+          createAndAppend('div', contributorData, {
+            text: contributor.login,
+          });
+          createAndAppend('div', contributorData, {
+            text: contributor.contributions,
             class: 'contributor-badge',
           });
         });
       })
-      .catch(e => renderError(e));
+      .catch(error => renderError(error));
   }
 
   function initialize(repos) {
     repos.sort((one, two) => one.name.toLowerCase().localeCompare(two.name.toLowerCase()));
-    const rt = document.getElementById('root');
-    const header = createAndAppend('header', rt, { class: 'header' });
-    const container = createAndAppend('div', rt, { id: 'container' });
-    createAndAppend('p', header, { text: 'HYF Repositories' });
+    const root = document.getElementById('root');
+    const header = createAndAppend('header', root, {
+      class: 'header',
+    });
+    const container = createAndAppend('div', root, {
+      id: 'container',
+    });
+    createAndAppend('p', header, {
+      text: 'HYF Repositories',
+    });
     const selector = createAndAppend('select', header, {
       class: 'repo-selector',
       'aria-label': 'HYF Repositories',
@@ -121,14 +144,14 @@
       }
       secondPart(selector.value, repos);
     });
-    const names = repos.map(repo => repo.name);
-    names.forEach((name, index) => {
+    const reposNames = repos.map(repo => repo.name);
+    reposNames.forEach((name, index) => {
       createAndAppend('option', selector, {
         text: name,
         value: index,
       });
     });
-    secondPart(selector.value, repos);
+    secondPart(repos[selector.value]);
   }
 
   const HYF_REPOS_URL = 'https://api.github.com/orgs/HackYourFuture/repos?per_page=100';
@@ -136,6 +159,6 @@
   window.onload = () => {
     fetchJSON(HYF_REPOS_URL)
       .then(data => initialize(data))
-      .catch(err => renderError(err));
+      .catch(error => renderError(error));
   };
 }
